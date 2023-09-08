@@ -1,0 +1,111 @@
+﻿@model List<User>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int count = 1;
+}
+
+<h1>Users</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <form action="#">
+                <div class="mb-3">
+                    <label class="form-label">Firstname</label>
+                    <input type="text" class="form-control" id="inp_name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Lastname</label>
+                    <input type="text" class="form-control" id="inp_surname" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="inp_email" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Age</label>
+                    <input type="text" class="form-control" id="inp_age" />
+                </div>
+                <div class="mb-3">
+                    <button type="button" class="btn btn-primary" id="btn_add">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-6">
+            <table class="table" id="users_table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Firstname</th>
+                        <th scope="col">Lastname</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Age</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <th scope="row">@count</th>
+                            <td>@user.Firstname</td>
+                            <td>@user.lastname</td>
+                            <td>@user.Email</td>
+                            <td>@user.Age</td>
+                        </tr>
+
+                        count++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $("#btn_add").click(function () {
+                let name = $("#inp_name").val();
+                let surname = $("#inp_surname").val();
+                let email = $("#inp_email").val();
+                let age = $("#inp_age").val();
+
+
+                $.ajax({
+                    url: "/User/Add",
+                    method: "post",
+                    type: "json",
+                    data: {
+                        name: name,
+                        surname: surname,
+                        email: email,
+                        age: age
+                    },
+                    success: function (response) {
+                        if (response.status == 200) {
+                            let tr = `
+                                                                         <tr>
+                                                                             <th scope="row">${response.data.id}</th>
+                                                                             <td>${response.data.firstname}</td>
+                                                                             <td>${response.data.lastname}</td>
+                                                                             <td>${response.data.email}</td>
+                                                                             <td>${response.data.age}</td>
+                                                                         </tr>
+                                                                                    `;
+                            $("#users_table tbody").append(tr);
+
+
+                            $("#inp_name").attr("value", "");
+                            $("#inp_surname").attr("value", "");
+                            $("#inp_email").attr("value", "");
+                            $("#inp_age").attr("value", "");
+                        }
+                    }
+                });
+
+            });
+        });
+    </script>
+}
